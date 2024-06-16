@@ -4,6 +4,7 @@ package com.plr.loudworkouttimer
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -201,7 +203,7 @@ fun MainScreen() {
                         DropdownMenuItem(
                             leadingIcon = {
                                 Icon(
-                                    Icons.Default.Star,
+                                    Icons.Default.ThumbUp,
                                     "Rate",
                                     tint = MaterialTheme.colorScheme.primary
                                 ) },
@@ -209,6 +211,8 @@ fun MainScreen() {
                                 Text("Rate this app")
                             },
                             onClick = {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.plr.loudworkouttimer"))
+                                mainContext.startActivity(intent)
                                 showContextMenu = false
                             },
                         )

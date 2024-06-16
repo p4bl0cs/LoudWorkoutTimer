@@ -4,6 +4,8 @@ package com.plr.loudworkouttimer
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,12 +14,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -129,6 +137,30 @@ fun AboutScreen() {
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = subTitleFontSize,
             )
+
+            ElevatedButton(
+                modifier = Modifier.padding(top = 20.dp),
+                colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.tertiary),
+                onClick = {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.plr.loudworkouttimer"))
+                currentActivity.startActivity(intent)
+            }) {
+                Row () {
+                    Icon(
+                        Icons.Default.ThumbUp,
+                        "Rate",
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
+
+                    Spacer(modifier = Modifier.width(width = 10.dp))
+
+                    Text(
+                        text = "Rate this app",
+                        color = MaterialTheme.colorScheme.tertiary,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
         }
     }
 }

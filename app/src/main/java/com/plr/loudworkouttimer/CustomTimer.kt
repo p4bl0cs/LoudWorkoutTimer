@@ -27,7 +27,6 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
     val isRunning = _isRunning.asStateFlow()
 
     private val _seconds = MutableStateFlow(initialSeconds)
-    val seconds = _seconds.asStateFlow()
 
     private val _progress = MutableStateFlow(0F)
     val progress = _progress.asStateFlow()
@@ -47,8 +46,6 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
     var set: Int = initialReps
 
     val step: Float = 1 / 60f
-
-
 
     init {
         _currentStatus.value = "Touch to start"

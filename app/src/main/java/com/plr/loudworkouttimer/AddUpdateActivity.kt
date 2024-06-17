@@ -76,17 +76,17 @@ fun AddUpdateScreen() {
         currentIntent.getStringExtra("timerName").orEmpty(),
         currentIntent.getIntExtra("seconds", 30),
         currentIntent.getIntExtra("sets", 1),
-        currentIntent.getIntExtra("restTime", 15),
+        currentIntent.getIntExtra("breakTime", 15),
         currentIntent.getIntExtra("id", 0))
 
     var _timerName by remember { mutableStateOf(_timerInfo.name) }
     var _minutes by remember { mutableStateOf(_timerInfo.initialSeconds / 60) }
     var _seconds by remember { mutableStateOf(_timerInfo.initialSeconds % 60) }
 
-    var _restMinutes by remember { mutableStateOf(_timerInfo.breakSeconds / 60) }
-    var _restSeconds by remember { mutableStateOf(_timerInfo.breakSeconds % 60) }
+    var _breakMinutes by remember { mutableStateOf(_timerInfo.breakSeconds / 60) }
+    var _breakSeconds by remember { mutableStateOf(_timerInfo.breakSeconds % 60) }
 
-    var _reps by remember { mutableStateOf(_timerInfo.initialSets) }
+    var _sets by remember { mutableStateOf(_timerInfo.initialSets) }
 
     val labelFontSize = 4.5.em
     val numberFontSize = 8.em
@@ -215,14 +215,14 @@ fun AddUpdateScreen() {
 
                 NumberPicker(
                     dividersColor = MaterialTheme.colorScheme.primary,
-                    value = _restMinutes,
+                    value = _breakMinutes,
                     range = 0..14,
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = numberFontSize,
                         fontWeight = FontWeight.Bold),
                     onValueChange = {
-                        _restMinutes = it
+                        _breakMinutes = it
                     }
                 )
 
@@ -236,14 +236,14 @@ fun AddUpdateScreen() {
 
                 NumberPicker(
                     dividersColor = MaterialTheme.colorScheme.primary,
-                    value = _restSeconds,
+                    value = _breakSeconds,
                     range = 10..59,
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = numberFontSize,
                         fontWeight = FontWeight.Bold),
                     onValueChange = {
-                        _restSeconds = it
+                        _breakSeconds = it
                     }
                 )
             }
@@ -274,14 +274,14 @@ fun AddUpdateScreen() {
                 horizontalArrangement = Arrangement.Center) {
                 NumberPicker(
                     dividersColor = MaterialTheme.colorScheme.primary,
-                    value = _reps,
+                    value = _sets,
                     range = 1..20,
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = numberFontSize,
                         fontWeight = FontWeight.Bold),
                     onValueChange = {
-                        _reps = it
+                        _sets = it
                     }
                 )
             }
@@ -347,7 +347,6 @@ fun AddUpdateScreen() {
                             return@ElevatedButton
                         }
 
-
                         val nameChanged = _timerInfo.id != null && _timerInfo.id!! > 0 && _timerInfo.name.lowercase() != _timerName.lowercase().trim()
 
                         if (!timerRepo.ExistNoDuplicates(_timerName.trim())) {
@@ -362,9 +361,9 @@ fun AddUpdateScreen() {
                         }
 
                         _timerInfo.name = _timerName
-                        _timerInfo.initialSets = _reps
+                        _timerInfo.initialSets = _sets
                         _timerInfo.initialSeconds = (_minutes * 60) + _seconds
-                        _timerInfo.breakSeconds = (_restMinutes * 60) + _restSeconds
+                        _timerInfo.breakSeconds = (_breakMinutes * 60) + _breakSeconds
 
                         val result = timerRepo.AddOrUpdateTimerInfo(_timerInfo)
 

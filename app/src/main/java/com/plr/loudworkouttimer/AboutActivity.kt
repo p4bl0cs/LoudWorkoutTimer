@@ -11,7 +11,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,12 +18,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -88,6 +84,7 @@ fun AboutScreen() {
                 title = {
                     Text(text = "About")
                 },
+
                 navigationIcon = {
                     IconButton(onClick = {
                         currentActivity.onBackPressed()
@@ -95,6 +92,7 @@ fun AboutScreen() {
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
                 },
+
                 colors = TopAppBarDefaults.topAppBarColors(
                     titleContentColor = MaterialTheme.colorScheme.tertiary,
                     containerColor = MaterialTheme.colorScheme.primary

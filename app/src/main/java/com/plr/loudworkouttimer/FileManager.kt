@@ -3,7 +3,6 @@ package com.plr.loudworkouttimer
 import android.content.Context
 import android.content.SharedPreferences
 
-
 class FileManager(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("lwt", Context.MODE_PRIVATE)
 

@@ -58,7 +58,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.Lifecycle
@@ -96,7 +95,9 @@ fun ComposableLifecycle(
         val observer = LifecycleEventObserver { source, event ->
             onEvent(source, event)
         }
+
         lifeCycleOwner.lifecycle.addObserver(observer)
+
         onDispose {
             lifeCycleOwner.lifecycle.removeObserver(observer)
         }
@@ -126,8 +127,13 @@ fun MainScreen() {
         mutableStateOf(TimerInfo("", 0, 0, 0, null))
     }
 
+    var isOnCreateEvent = false
+
     ComposableLifecycle { _, event ->
-        if (event == Lifecycle.Event.ON_RESUME) {
+        if (event == Lifecycle.Event.ON_CREATE) {
+            isOnCreateEvent = true
+        }
+        else if (event == Lifecycle.Event.ON_RESUME) {
             val fm = FileManager(mainContext)
             val x = fm.getData("x", "")
             val cd = Date()
@@ -140,7 +146,10 @@ fun MainScreen() {
                 return@ComposableLifecycle
             }
 
-            openTrialDialog.value = true
+            if (isOnCreateEvent) {
+                isOnCreateEvent = false
+                openTrialDialog.value = true
+            }
 
             refreshData(data, timerRepo)
         }
@@ -151,6 +160,7 @@ fun MainScreen() {
             onDismissRequest = {
                 openDialog.value = false
             },
+
             title = {
                 Text(
                     text = "Delete Timer",
@@ -158,6 +168,7 @@ fun MainScreen() {
                     fontWeight = FontWeight.SemiBold
                 )
             },
+
             text = {
                 Text(
                     text = "Do you really want to delete '${selectedTimerInfo.name}'?",
@@ -165,6 +176,7 @@ fun MainScreen() {
                     fontSize = subTitleFontSize
                 )
             },
+
             confirmButton = {
                 Button(
                     onClick = {
@@ -179,6 +191,7 @@ fun MainScreen() {
                     )
                 }
             },
+
             dismissButton = {
                 Button(
                     onClick = {
@@ -199,6 +212,7 @@ fun MainScreen() {
             onDismissRequest = {
                 openTrialDialog.value = false
             },
+
             title = {
                 Text(
                     text = "Free Trial",
@@ -206,6 +220,7 @@ fun MainScreen() {
                     fontWeight = FontWeight.SemiBold
                 )
             },
+
             text = {
                 Text(
                     text = "Please consider purchasing the full version of Loud Workout Timer.",
@@ -213,6 +228,7 @@ fun MainScreen() {
                     fontSize = subTitleFontSize
                 )
             },
+
             confirmButton = {
                 Button(
                     onClick = {
@@ -227,6 +243,7 @@ fun MainScreen() {
                     )
                 }
             },
+
             dismissButton = {
                 Button(
                     onClick = {
@@ -248,6 +265,7 @@ fun MainScreen() {
                 openEndDialog.value = false
                 (mainContext as Activity).finish()
             },
+
             title = {
                 Text(
                     text = "Free Trial",
@@ -255,6 +273,7 @@ fun MainScreen() {
                     fontWeight = FontWeight.SemiBold
                 )
             },
+
             text = {
                 Text(
                     text = "The Free Trial period has expired.\n\nPlease consider purchasing the full version of Loud Workout Timer.",
@@ -262,6 +281,7 @@ fun MainScreen() {
                     fontSize = subTitleFontSize
                 )
             },
+
             confirmButton = {
                 Button(
                     onClick = {
@@ -276,6 +296,7 @@ fun MainScreen() {
                     )
                 }
             },
+
             dismissButton = {
                 Button(
                     onClick = {
@@ -291,17 +312,18 @@ fun MainScreen() {
         )
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = "Loud Workout Timer (Free Trial)")
                 },
+
                 colors = topAppBarColors(
                     titleContentColor = MaterialTheme.colorScheme.tertiary,
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
+
                 actions = {
                     IconButton(onClick = {
                         showContextMenu = !showContextMenu
@@ -323,9 +345,11 @@ fun MainScreen() {
                                     "Buy",
                                     tint = MaterialTheme.colorScheme.primary
                                 ) },
+
                             text = {
                                 Text("Buy the full version")
                             },
+
                             onClick = {
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.plr.loudworkouttimer"))
                                 mainContext.startActivity(intent)
@@ -339,9 +363,11 @@ fun MainScreen() {
                                     contentDescription = "About",
                                     tint = MaterialTheme.colorScheme.primary
                                 ) },
+
                             text = {
                                 Text(text = "About")
                             },
+
                             onClick = {
                                 val intent = Intent(mainContext, AboutActivity::class.java)
                                 mainContext.startActivity(intent)
@@ -358,8 +384,7 @@ fun MainScreen() {
                 modifier = Modifier
                     .padding(top = 80.dp, bottom = 80.dp)
                     .background(color = MaterialTheme.colorScheme.tertiary),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ){
                 items(data) {t ->
                     Card (
@@ -368,11 +393,13 @@ fun MainScreen() {
                                 val intent = Intent(mainContext, TimerActivity::class.java)
                                 intent.putExtra("seconds", t.initialSeconds)
                                 intent.putExtra("sets", t.initialSets)
-                                intent.putExtra("restTime", t.breakSeconds)
+                                intent.putExtra("breakTime", t.breakSeconds)
                                 mainContext.startActivity(intent)
                             }
                             .padding(start = 10.dp, end = 10.dp),
+
                         border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                     ) {
                         Row (
@@ -407,7 +434,7 @@ fun MainScreen() {
                                     intent.putExtra("timerName", t.name)
                                     intent.putExtra("seconds", t.initialSeconds)
                                     intent.putExtra("sets", t.initialSets)
-                                    intent.putExtra("restTime", t.breakSeconds)
+                                    intent.putExtra("breakTime", t.breakSeconds)
                                     intent.putExtra("id", t.id)
                                     mainContext.startActivity(intent)
                                 }) {
@@ -462,7 +489,6 @@ fun MainScreen() {
                 )
             }
         }
-
     )
 }
 
@@ -494,12 +520,4 @@ private fun getDifferenceBetweenDates(initDate: Date, endDate: Date): Long {
     val days = hours / 24
 
     return days
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LoudWorkoutTimerTheme {
-        MainScreen()
-    }
 }

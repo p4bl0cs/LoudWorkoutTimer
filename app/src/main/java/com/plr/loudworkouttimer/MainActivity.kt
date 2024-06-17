@@ -3,6 +3,7 @@
 package com.plr.loudworkouttimer
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -27,8 +28,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -65,6 +65,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.plr.loudworkouttimer.ui.theme.LoudWorkoutTimerTheme
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 
@@ -109,6 +111,8 @@ fun MainScreen() {
     }
 
     val openDialog = remember { mutableStateOf(false) }
+    val openTrialDialog = remember { mutableStateOf(false) }
+    val openEndDialog = remember { mutableStateOf(false) }
 
     val mainContext = LocalContext.current
     val timerRepo = TimerRepo(mainContext)
@@ -124,6 +128,20 @@ fun MainScreen() {
 
     ComposableLifecycle { _, event ->
         if (event == Lifecycle.Event.ON_RESUME) {
+            val fm = FileManager(mainContext)
+            val x = fm.getData("x", "")
+            val cd = Date()
+
+            if (x == "") {
+                fm.saveData("x", SimpleDateFormat("ssddHHMMmmyyyyssSSS").format(cd))
+            }
+            else if (getDifferenceBetweenDates(cd, SimpleDateFormat("ssddHHMMmmyyyyssSSS").parse(x)) > 6) {
+                openEndDialog.value = true
+                return@ComposableLifecycle
+            }
+
+            openTrialDialog.value = true
+
             refreshData(data, timerRepo)
         }
     }
@@ -176,11 +194,109 @@ fun MainScreen() {
         )
     }
 
+    if (openTrialDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                openTrialDialog.value = false
+            },
+            title = {
+                Text(
+                    text = "Free Trial",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            text = {
+                Text(
+                    text = "Please consider purchasing the full version of Loud Workout Timer.",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = subTitleFontSize
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.plr.loudworkouttimer"))
+                        mainContext.startActivity(intent)
+                        openTrialDialog.value = false
+                    }
+                ) {
+                    Text(
+                        text = "Purchase",
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        openTrialDialog.value = false
+                    }
+                ) {
+                    Text(
+                        text = "Not yet",
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            }
+        )
+    }
+
+    if (openEndDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                openEndDialog.value = false
+                (mainContext as Activity).finish()
+            },
+            title = {
+                Text(
+                    text = "Free Trial",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            text = {
+                Text(
+                    text = "The Free Trial period has expired.\n\nPlease consider purchasing the full version of Loud Workout Timer.",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = subTitleFontSize
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.plr.loudworkouttimer"))
+                        mainContext.startActivity(intent)
+                        (mainContext as Activity).finish()
+                    }
+                ) {
+                    Text(
+                        text = "Purchase",
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        (mainContext as Activity).finish()
+                    }
+                ) {
+                    Text(
+                        text = "Not yet",
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+            }
+        )
+    }
+
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Loud Workout Timer")
+                    Text(text = "Loud Workout Timer (Free Trial)")
                 },
                 colors = topAppBarColors(
                     titleContentColor = MaterialTheme.colorScheme.tertiary,
@@ -203,12 +319,12 @@ fun MainScreen() {
                         DropdownMenuItem(
                             leadingIcon = {
                                 Icon(
-                                    Icons.Default.ThumbUp,
-                                    "Rate",
+                                    Icons.Default.ShoppingCart,
+                                    "Buy",
                                     tint = MaterialTheme.colorScheme.primary
                                 ) },
                             text = {
-                                Text("Rate this app")
+                                Text("Buy the full version")
                             },
                             onClick = {
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.plr.loudworkouttimer"))
@@ -324,10 +440,10 @@ fun MainScreen() {
                 onClick = {
                     val itemCount = timerRepo.GetTimerInfoList().size
 
-                    if (itemCount == 16) {
+                    if (itemCount > 0) {
                         Toast.makeText(
                             mainContext,
-                            "Max timers limit reached (16).",
+                            "Max timers limit reached (1). Buy the full version to remove this limit.",
                             Toast.LENGTH_LONG
                         ).show()
 
@@ -350,7 +466,7 @@ fun MainScreen() {
     )
 }
 
-fun refreshData(data: SnapshotStateList<TimerInfo>, timerRepo: TimerRepo) {
+private fun refreshData(data: SnapshotStateList<TimerInfo>, timerRepo: TimerRepo) {
     data.clear()
     data.addAll(timerRepo.GetTimerInfoList())
 }
@@ -368,6 +484,16 @@ private fun formatSecondsToTime(totalSeconds: Int): String {
     }
 
     return "00:$totalSeconds"
+}
+
+private fun getDifferenceBetweenDates(initDate: Date, endDate: Date): Long {
+    val diff: Long = endDate.time - initDate.time
+    val seconds = diff / 1000
+    val minutes = seconds / 60
+    val hours = minutes / 60
+    val days = hours / 24
+
+    return days
 }
 
 @Preview(showBackground = true)

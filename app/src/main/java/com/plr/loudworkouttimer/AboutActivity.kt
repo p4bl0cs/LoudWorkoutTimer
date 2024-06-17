@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.ButtonDefaults
@@ -109,7 +110,7 @@ fun AboutScreen() {
             verticalArrangement = Arrangement.Center
         ) {
            Text(
-               text = "Loud Workout Timer v${versionName}",
+               text = "Loud Workout Timer",
                textAlign = TextAlign.Center,
                color = MaterialTheme.colorScheme.primary,
                fontSize = titleFontSize,
@@ -120,7 +121,7 @@ fun AboutScreen() {
 
             Row (horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Full Version",
+                    text = "Free Trial Version",
                     textAlign = TextAlign.Right,
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = subTitleFontSize,
@@ -129,10 +130,12 @@ fun AboutScreen() {
 
             Text(
                 modifier = Modifier.padding(top = 40.dp),
-                text = "Thank you for purchasing the full version of Loud Workout Timer.\n\n" +
+                text = "This is free trial version of Loud Workout Timer. The limitations are:\n\n" +
+                        "\t\u2022 You can only create 1 timer.\n\n" +
+                        "\t\u2022 You only have 7 days to use the app after launching it for the first time.\n\n" +
                         "This app was created to keep track with your workout times, sets and breaks without needing to keep an eye on your device's clock.\n\n" +
                         "Focus on your routine and let the app tell you how much you have left.\n\n" +
-                        "Please leave any comments or suggestions on the app's Play Store page. ",
+                        "If you find the app useful please consider purchasing the full version of Loud Workout Timer on the Play Store. ",
                 textAlign = TextAlign.Left,
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = subTitleFontSize,
@@ -147,15 +150,15 @@ fun AboutScreen() {
             }) {
                 Row () {
                     Icon(
-                        Icons.Default.ThumbUp,
-                        "Rate",
+                        Icons.Default.ShoppingCart,
+                        "Buy",
                         tint = MaterialTheme.colorScheme.tertiary
                     )
 
                     Spacer(modifier = Modifier.width(width = 10.dp))
 
                     Text(
-                        text = "Rate this app",
+                        text = "Buy the full version",
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.ExtraBold
                     )

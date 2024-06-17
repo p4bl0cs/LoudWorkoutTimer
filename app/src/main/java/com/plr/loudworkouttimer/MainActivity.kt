@@ -350,7 +350,7 @@ fun MainScreen() {
     )
 }
 
-fun refreshData(data: SnapshotStateList<TimerInfo>, timerRepo: TimerRepo) {
+private fun refreshData(data: SnapshotStateList<TimerInfo>, timerRepo: TimerRepo) {
     data.clear()
     data.addAll(timerRepo.GetTimerInfoList())
 }

@@ -38,11 +38,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.plr.loudworkouttimer.ui.theme.LoudWorkoutTimerTheme
@@ -52,7 +50,6 @@ class TimerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LoudWorkoutTimerTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -67,13 +64,16 @@ class TimerActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TimerScreen() {
-    var showTopBarMenu = false
     val mainContext = LocalContext.current
 
     val currentView = LocalView.current
     val currentIntent = (currentView.context as Activity).intent
     val currentActivity = LocalContext.current as Activity
-    val vm = CustomTimer(currentIntent.getIntExtra("seconds", 15), currentIntent.getIntExtra("sets", 2), currentIntent.getIntExtra("restTime", 10), mainContext.applicationContext as Application)
+    val vm = CustomTimer(
+        currentIntent.getIntExtra("seconds", 15),
+        currentIntent.getIntExtra("sets", 2),
+        currentIntent.getIntExtra("restTime", 10),
+        mainContext.applicationContext as Application)
 
     val progress by vm.progress.collectAsState()
     val isEnabled by vm.isEnabled.collectAsState()
@@ -84,7 +84,7 @@ fun TimerScreen() {
 
     val currentSet by vm.currentSet.collectAsState()
 
-    val currentTimerColorInt by vm.currentTimerColorInt.collectAsState()
+    val currentTimerColor by vm.currentTimerColor.collectAsState()
 
     DisposableEffect(Unit) {
         currentView.keepScreenOn = true
@@ -150,12 +150,12 @@ fun TimerScreen() {
                         .align(Alignment.TopEnd)
                         .padding(end = 20.dp),
                         text = currentSet,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = currentTimerColor,
                         fontWeight = FontWeight.Bold,
                         fontSize = 10.em)
 
                     CircularProgressIndicator(
-                        color = Color(currentTimerColorInt),
+                        color = currentTimerColor,
                         modifier = Modifier
                             .size(320.dp)
                             .clickable { startPauseTimer() },
@@ -167,7 +167,7 @@ fun TimerScreen() {
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(text = currentTime,
-                            color = Color(currentTimerColorInt),
+                            color = currentTimerColor,
                             fontWeight = FontWeight.Black,
                             fontSize = 18.em)
                     }
@@ -195,13 +195,5 @@ fun TimerScreen() {
                     fontSize = 12.em)
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview2() {
-    LoudWorkoutTimerTheme {
-        TimerScreen()
     }
 }

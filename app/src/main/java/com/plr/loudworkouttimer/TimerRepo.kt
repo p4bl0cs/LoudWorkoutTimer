@@ -7,7 +7,7 @@ import com.google.gson.Gson
 
 class TimerRepo(private val context: Context) {
 
-    fun GetTimerInfoList() : SnapshotStateList<TimerInfo> {
+    fun getTimerInfoList() : SnapshotStateList<TimerInfo> {
         val gson = Gson()
         val fileManager = FileManager(context)
 
@@ -15,9 +15,9 @@ class TimerRepo(private val context: Context) {
         return gson.fromJson(timerInfoListJson, Array<TimerInfo>::class.java).toList().toMutableStateList()
     }
 
-    fun AddOrUpdateTimerInfo(timerInfo: TimerInfo) : TimerInfo? {
+    fun addOrUpdateTimerInfo(timerInfo: TimerInfo) : TimerInfo? {
         try {
-            if (!ExistNoDuplicates(timerInfo.name.trim())) {
+            if (!existNoDuplicates(timerInfo.name.trim())) {
                 if (timerInfo.id == null || timerInfo.id!! <= 0) {
                     return null
                 }
@@ -26,13 +26,13 @@ class TimerRepo(private val context: Context) {
             val result = TimerInfo(timerInfo.name, timerInfo.initialSeconds, timerInfo.initialSets, timerInfo.breakSeconds, null)
 
             if (timerInfo.id == null || timerInfo.id!! == 0) {
-                result.id = GetTimerInfoMaxID() + 1
+                result.id = getTimerInfoMaxID() + 1
 
-                AddTimerInfo(result)
+                addTimerInfo(result)
             }
             else {
                 result.id = timerInfo.id
-                UpdateTimerInfo(result)
+                updateTimerInfo(result)
             }
 
             return result
@@ -42,9 +42,9 @@ class TimerRepo(private val context: Context) {
         }
     }
 
-    fun DeleteTimerInfo(id: Int) : Boolean {
+    fun deleteTimerInfo(id: Int) : Boolean {
         try {
-            val timerInfoList = GetTimerInfoList()
+            val timerInfoList = getTimerInfoList()
             val existingTimerInfo = timerInfoList.find { it.id == id }
 
             if (existingTimerInfo == null) {
@@ -53,7 +53,7 @@ class TimerRepo(private val context: Context) {
 
             timerInfoList.remove(existingTimerInfo)
 
-            SaveTimerList(timerInfoList)
+            saveTimerList(timerInfoList)
 
             return true
         }
@@ -62,8 +62,8 @@ class TimerRepo(private val context: Context) {
         }
     }
 
-    fun ExistNoDuplicates(name: String) : Boolean {
-        val timerInfoList = GetTimerInfoList()
+    fun existNoDuplicates(name: String) : Boolean {
+        val timerInfoList = getTimerInfoList()
 
         if (!timerInfoList.any()) {
             return true
@@ -72,8 +72,8 @@ class TimerRepo(private val context: Context) {
         return timerInfoList.find { it.name.lowercase() == name.lowercase() } == null
     }
 
-    private fun GetTimerInfoMaxID() : Int {
-        val timerInfoList = GetTimerInfoList()
+    private fun getTimerInfoMaxID() : Int {
+        val timerInfoList = getTimerInfoList()
 
         if (timerInfoList.any()) {
             return timerInfoList.maxBy { it.id!! }.id!!.toInt()
@@ -82,21 +82,21 @@ class TimerRepo(private val context: Context) {
         return 1
     }
 
-    private fun AddTimerInfo(timerInfo: TimerInfo) : Boolean{
-        val timerInfoList = GetTimerInfoList()
+    private fun addTimerInfo(timerInfo: TimerInfo) : Boolean{
+        val timerInfoList = getTimerInfoList()
 
         if (timerInfoList.any {it.name.lowercase() == timerInfo.name.lowercase()}) {
             throw Exception("Duplicated name.")
         }
 
         timerInfoList.add(timerInfo)
-        SaveTimerList(timerInfoList)
+        saveTimerList(timerInfoList)
 
         return true
     }
 
-    private fun UpdateTimerInfo(timerInfo: TimerInfo) : Boolean {
-        val timerInfoList = GetTimerInfoList()
+    private fun updateTimerInfo(timerInfo: TimerInfo) : Boolean {
+        val timerInfoList = getTimerInfoList()
 
         val existingTimerInfo = timerInfoList.find { it.id == timerInfo.id }
 
@@ -109,12 +109,12 @@ class TimerRepo(private val context: Context) {
         existingTimerInfo.initialSets = timerInfo.initialSets
         existingTimerInfo.breakSeconds = timerInfo.breakSeconds
 
-        SaveTimerList(timerInfoList)
+        saveTimerList(timerInfoList)
 
         return true
     }
 
-    private fun SaveTimerList(timerInfoList: List<TimerInfo>) : Boolean {
+    private fun saveTimerList(timerInfoList: List<TimerInfo>) : Boolean {
         val gson = Gson()
         val json = gson.toJson(timerInfoList)
 

@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,17 +26,17 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,7 +57,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.Lifecycle
@@ -75,8 +73,8 @@ class MainActivity : ComponentActivity() {
             LoudWorkoutTimerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.secondary
                 ) {
                     MainScreen()
                 }
@@ -94,7 +92,9 @@ fun ComposableLifecycle(
         val observer = LifecycleEventObserver { source, event ->
             onEvent(source, event)
         }
+
         lifeCycleOwner.lifecycle.addObserver(observer)
+
         onDispose {
             lifeCycleOwner.lifecycle.removeObserver(observer)
         }
@@ -113,7 +113,7 @@ fun MainScreen() {
     val mainContext = LocalContext.current
     val timerRepo = TimerRepo(mainContext)
 
-    val data = remember { TimerRepo(mainContext).GetTimerInfoList()}
+    val data = remember { TimerRepo(mainContext).getTimerInfoList()}
 
     val titleFontSize = 6.em
     val subTitleFontSize = 3.5.em
@@ -133,6 +133,7 @@ fun MainScreen() {
             onDismissRequest = {
                 openDialog.value = false
             },
+
             title = {
                 Text(
                     text = "Delete Timer",
@@ -140,6 +141,7 @@ fun MainScreen() {
                     fontWeight = FontWeight.SemiBold
                 )
             },
+
             text = {
                 Text(
                     text = "Do you really want to delete '${selectedTimerInfo.name}'?",
@@ -147,10 +149,11 @@ fun MainScreen() {
                     fontSize = subTitleFontSize
                 )
             },
+
             confirmButton = {
                 Button(
                     onClick = {
-                        timerRepo.DeleteTimerInfo(selectedTimerInfo.id!!)
+                        timerRepo.deleteTimerInfo(selectedTimerInfo.id!!)
                         refreshData(data, timerRepo)
                         openDialog.value = false
                     }
@@ -161,6 +164,7 @@ fun MainScreen() {
                     )
                 }
             },
+
             dismissButton = {
                 Button(
                     onClick = {
@@ -182,10 +186,12 @@ fun MainScreen() {
                 title = {
                     Text(text = "Loud Workout Timer")
                 },
+
                 colors = topAppBarColors(
                     titleContentColor = MaterialTheme.colorScheme.tertiary,
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
+
                 actions = {
                     IconButton(onClick = {
                         showContextMenu = !showContextMenu
@@ -207,9 +213,11 @@ fun MainScreen() {
                                     "Rate",
                                     tint = MaterialTheme.colorScheme.primary
                                 ) },
+
                             text = {
                                 Text("Rate this app")
                             },
+
                             onClick = {
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.plr.loudworkouttimer"))
                                 mainContext.startActivity(intent)
@@ -223,9 +231,11 @@ fun MainScreen() {
                                     contentDescription = "About",
                                     tint = MaterialTheme.colorScheme.primary
                                 ) },
+
                             text = {
                                 Text(text = "About")
                             },
+
                             onClick = {
                                 val intent = Intent(mainContext, AboutActivity::class.java)
                                 mainContext.startActivity(intent)
@@ -246,18 +256,21 @@ fun MainScreen() {
 
             ){
                 items(data) {t ->
-                    Card (
+                    ElevatedCard (
                         modifier = Modifier
                             .clickable {
                                 val intent = Intent(mainContext, TimerActivity::class.java)
+                                intent.putExtra("workOutName", t.name)
                                 intent.putExtra("seconds", t.initialSeconds)
                                 intent.putExtra("sets", t.initialSets)
                                 intent.putExtra("restTime", t.breakSeconds)
                                 mainContext.startActivity(intent)
                             }
                             .padding(start = 10.dp, end = 10.dp),
-                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+
+                        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 5.dp, pressedElevation = 0.dp, focusedElevation = 0.dp),
+
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                     ) {
                         Row (
                             modifier = Modifier.padding(
@@ -298,7 +311,7 @@ fun MainScreen() {
                                 Icon(
                                     imageVector = Icons.Filled.Edit,
                                     contentDescription = "Edit",
-                                    tint = MaterialTheme.colorScheme.tertiary
+                                    tint = MaterialTheme.colorScheme.secondaryContainer
                                 )
                             }
 
@@ -310,7 +323,7 @@ fun MainScreen() {
                                 Icon(
                                     imageVector = Icons.Filled.Delete,
                                     contentDescription = "Delete",
-                                    tint = MaterialTheme.colorScheme.tertiary
+                                    tint = MaterialTheme.colorScheme.secondaryContainer
                                 )
                             }
                         }
@@ -322,7 +335,7 @@ fun MainScreen() {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    val itemCount = timerRepo.GetTimerInfoList().size
+                    val itemCount = timerRepo.getTimerInfoList().size
 
                     if (itemCount == 16) {
                         Toast.makeText(
@@ -338,7 +351,10 @@ fun MainScreen() {
                     intent.putExtra("operationName", "Add new timer")
                     mainContext.startActivity(intent)
                 },
-                containerColor = MaterialTheme.colorScheme.primary
+
+                containerColor = MaterialTheme.colorScheme.primary,
+
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 5.dp)
             ) {
                 Icon(
                     Icons.Filled.Add, contentDescription = "Add new Timer",
@@ -352,7 +368,7 @@ fun MainScreen() {
 
 private fun refreshData(data: SnapshotStateList<TimerInfo>, timerRepo: TimerRepo) {
     data.clear()
-    data.addAll(timerRepo.GetTimerInfoList())
+    data.addAll(timerRepo.getTimerInfoList())
 }
 
 private fun formatSecondsToTime(totalSeconds: Int): String {
@@ -368,12 +384,4 @@ private fun formatSecondsToTime(totalSeconds: Int): String {
     }
 
     return "00:$totalSeconds"
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LoudWorkoutTimerTheme {
-        MainScreen()
-    }
 }

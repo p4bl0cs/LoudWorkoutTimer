@@ -101,6 +101,7 @@ fun AddUpdateScreen() {
                 title = {
                     Text(text = currentIntent.getStringExtra("operationName").orEmpty())
                 },
+
                 navigationIcon = {
                     IconButton(onClick = {
                         currentActivity.onBackPressed()
@@ -108,6 +109,7 @@ fun AddUpdateScreen() {
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
                 },
+
                 colors = TopAppBarDefaults.topAppBarColors(
                     titleContentColor = MaterialTheme.colorScheme.tertiary,
                     containerColor = MaterialTheme.colorScheme.primary
@@ -337,6 +339,8 @@ fun AddUpdateScreen() {
                 ElevatedButton(
                     colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.tertiary),
 
+                    elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 5.dp),
+
                     onClick = {
                         if (_timerName.trim().isEmpty()) {
                             Toast.makeText(
@@ -347,10 +351,9 @@ fun AddUpdateScreen() {
                             return@ElevatedButton
                         }
 
-
                         val nameChanged = _timerInfo.id != null && _timerInfo.id!! > 0 && _timerInfo.name.lowercase() != _timerName.lowercase().trim()
 
-                        if (!timerRepo.ExistNoDuplicates(_timerName.trim())) {
+                        if (!timerRepo.existNoDuplicates(_timerName.trim())) {
                             if (nameChanged || _timerInfo.id!! == 0) {
                                 Toast.makeText(
                                     mainContext,
@@ -366,7 +369,7 @@ fun AddUpdateScreen() {
                         _timerInfo.initialSeconds = (_minutes * 60) + _seconds
                         _timerInfo.breakSeconds = (_restMinutes * 60) + _restSeconds
 
-                        val result = timerRepo.AddOrUpdateTimerInfo(_timerInfo)
+                        val result = timerRepo.addOrUpdateTimerInfo(_timerInfo)
 
                         if (result == null) {
                             Toast.makeText(mainContext, "A problem occurred", Toast.LENGTH_LONG).show()

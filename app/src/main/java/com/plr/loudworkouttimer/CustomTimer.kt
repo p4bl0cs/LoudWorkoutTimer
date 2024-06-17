@@ -1,7 +1,6 @@
 package com.plr.loudworkouttimer
 
 import android.app.Application
-import android.graphics.Color
 import android.os.CountDownTimer
 import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,10 +9,7 @@ import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 
 class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: Application) : AndroidViewModel(app) {
-    private val _intColorYellow = Color.parseColor("#F4EA0F")
-    private val _intColorGreen = Color.parseColor("#FFb6ff00")
-    private val _intColorRed = Color.parseColor("#FFB31818")
-    private val _intColorBlue = Color.parseColor("#FF5885AF")
+    private val colorScheme = CustomColorScheme.getInstance()
 
     private var _timer: CountDownTimer? = null
     private val tts: Tts = Tts()
@@ -27,7 +23,6 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
     val isRunning = _isRunning.asStateFlow()
 
     private val _seconds = MutableStateFlow(initialSeconds)
-    val seconds = _seconds.asStateFlow()
 
     private val _progress = MutableStateFlow(0F)
     val progress = _progress.asStateFlow()
@@ -41,14 +36,12 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
     private val _currentSet = MutableStateFlow("")
     val currentSet = _currentSet.asStateFlow()
 
-    private val _currentTimerColorInt = MutableStateFlow(_intColorGreen)
-    val currentTimerColorInt = _currentTimerColorInt.asStateFlow()
+    private val _currentTimerColor = MutableStateFlow(colorScheme!!.primary)
+    val currentTimerColor = _currentTimerColor.asStateFlow()
 
     var set: Int = initialReps
 
     val step: Float = 1 / 60f
-
-
 
     init {
         _currentStatus.value = "Touch to start"
@@ -64,7 +57,7 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
 
             override fun onTick(millisRemaining: Long) {
                 if (_isDownCounting == null) {
-                    _currentTimerColorInt.value = _intColorYellow
+                    _currentTimerColor.value = colorScheme!!.secondary
                     _isEnabled.value = false
                     _isDownCounting = true
                     _seconds.value = 3
@@ -78,13 +71,17 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
                     _seconds.value--
                     _currentTime.value = if (_seconds.value == 0) "GO!" else _seconds.value.toString()
 
-                    if (_seconds.value == 0) {
-                        _currentTimerColorInt.value = _intColorGreen
+                    if (_seconds.value == 1) {
+                        tts.textToSpeech(app.applicationContext, "Lets go!")
+                        _currentStatus.value = "Lets go!"
+                    }
+                    else if (_seconds.value == 0) {
+                        _seconds.value = initialSeconds
+                        _currentTime.value = formatSecondsToTime()
+                        _currentTimerColor.value = colorScheme!!.primaryContainer
                         _isDownCounting = false
                         _isEnabled.value = true
                         _currentStatus.value = ""
-                        tts.textToSpeech(app.applicationContext, "Lets go!")
-                        _seconds.value = initialSeconds + 1
                     }
 
                     return
@@ -109,8 +106,9 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
                                 _isResting = false
                                 _seconds.value = initialSeconds
                                 _currentStatus.value = ""
+                                _currentTime.value = formatSecondsToTime()
                                 _progress.value = if (60 - initialSeconds % 60 == 60) 0F else (60 - initialSeconds % 60) * step
-                                _currentTimerColorInt.value = _intColorGreen
+                                _currentTimerColor.value = colorScheme!!.primaryContainer
                             }
                         }
                     }
@@ -126,7 +124,7 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
                             _isResting = true
                             _currentSet.value = ""
                             _currentTime.value = formatSecondsToTime()
-                            _currentTimerColorInt.value = _intColorBlue
+                            _currentTimerColor.value = colorScheme!!.surface
                         }
                         else {
                             _timer?.cancel()
@@ -169,14 +167,14 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
     fun startTimer() {
         _isRunning.value = true
         _currentStatus.value = ""
-        _currentTimerColorInt.value = _intColorGreen
+        _currentTimerColor.value = colorScheme!!.primaryContainer
         _timer?.start()
     }
 
     fun cancelTimer() {
         _isRunning.value = false
         _currentStatus.value = "PAUSED"
-        _currentTimerColorInt.value = _intColorRed
+        _currentTimerColor.value = colorScheme!!.error
         _timer?.cancel()
     }
 
@@ -192,6 +190,7 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
         _currentTime.value = "0"
         _currentSet.value = ""
         _currentStatus.value = "COMPLETED"
+        _currentTimerColor.value = colorScheme!!.primary
         tts.textToSpeech(this.getApplication(), "COMPLETED")
         _progress.value = 1F
     }

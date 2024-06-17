@@ -111,7 +111,7 @@ fun AddUpdateScreen() {
                 },
 
                 colors = TopAppBarDefaults.topAppBarColors(
-                    titleContentColor = MaterialTheme.colorScheme.tertiary,
+                    titleContentColor = MaterialTheme.colorScheme.secondaryContainer,
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
@@ -337,7 +337,7 @@ fun AddUpdateScreen() {
                 horizontalArrangement = Arrangement.Center
             ) {
                 ElevatedButton(
-                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.tertiary),
+                    colors = ButtonDefaults.buttonColors(contentColor = MaterialTheme.colorScheme.secondaryContainer),
 
                     elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 5.dp),
 
@@ -382,7 +382,7 @@ fun AddUpdateScreen() {
                 ) {
                     Text(
                         text = "Save",
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }

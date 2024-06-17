@@ -94,7 +94,7 @@ fun AboutScreen() {
                 },
 
                 colors = TopAppBarDefaults.topAppBarColors(
-                    titleContentColor = MaterialTheme.colorScheme.tertiary,
+                    titleContentColor = MaterialTheme.colorScheme.secondaryContainer,
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
@@ -129,7 +129,7 @@ fun AboutScreen() {
             Text(
                 modifier = Modifier.padding(top = 40.dp),
                 text = "Thank you for purchasing the full version of Loud Workout Timer.\n\n" +
-                        "This app was created to keep track with your workout times, sets and breaks without needing to keep an eye on your device's clock.\n\n" +
+                        "This simple app was created to keep track with your workout times, sets and breaks without needing to keep an eye on your device's clock.\n\n" +
                         "Focus on your routine and let the app tell you how much you have left.\n\n" +
                         "Please leave any comments or suggestions on the app's Play Store page. ",
                 textAlign = TextAlign.Left,
@@ -148,14 +148,14 @@ fun AboutScreen() {
                     Icon(
                         Icons.Default.ThumbUp,
                         "Rate",
-                        tint = MaterialTheme.colorScheme.tertiary
+                        tint = MaterialTheme.colorScheme.secondaryContainer
                     )
 
                     Spacer(modifier = Modifier.width(width = 10.dp))
 
                     Text(
                         text = "Rate this app",
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }

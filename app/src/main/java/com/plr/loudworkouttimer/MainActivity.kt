@@ -160,7 +160,7 @@ fun MainScreen() {
                 ) {
                     Text(
                         text = "Delete",
-                        color = MaterialTheme.colorScheme.tertiary
+                        color = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
             },
@@ -173,7 +173,7 @@ fun MainScreen() {
                 ) {
                     Text(
                         text = "Cancel",
-                        color = MaterialTheme.colorScheme.tertiary
+                        color = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
             }
@@ -188,7 +188,7 @@ fun MainScreen() {
                 },
 
                 colors = topAppBarColors(
-                    titleContentColor = MaterialTheme.colorScheme.tertiary,
+                    titleContentColor = MaterialTheme.colorScheme.secondaryContainer,
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
 
@@ -358,7 +358,7 @@ fun MainScreen() {
             ) {
                 Icon(
                     Icons.Filled.Add, contentDescription = "Add new Timer",
-                    tint = MaterialTheme.colorScheme.tertiary
+                    tint = MaterialTheme.colorScheme.secondaryContainer
                 )
             }
         }

@@ -131,7 +131,7 @@ fun TimerScreen() {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    titleContentColor = MaterialTheme.colorScheme.tertiary,
+                    titleContentColor = MaterialTheme.colorScheme.secondaryContainer,
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )

@@ -143,6 +143,14 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
                     }
 
                     if (_seconds.value >= 60) {
+                        if (_seconds.value >= 90) {
+                            if (_seconds.value % 30 == 0 && (_seconds.value / 30) % 2 != 0) {
+                                val minutesLeft = _seconds.value / 60
+                                val isPlural = isNumberPlural(minutesLeft)
+                                tts.textToSpeech(app.applicationContext, "$minutesLeft ${(if (isPlural) "minutes" else "minute")} and thirty seconds left.")
+                            }
+                        }
+
                         if (_seconds.value % 60 == 0) {
                             val minutesLeft = _seconds.value / 60
                             val isPlural = isNumberPlural(minutesLeft)

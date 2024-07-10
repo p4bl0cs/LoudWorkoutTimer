@@ -2,6 +2,7 @@ package com.plr.loudworkouttimer
 
 import android.app.Application
 import android.os.CountDownTimer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -137,7 +138,7 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
                     if (_seconds.value < 60) {
                         if (_seconds.value in 1..5) {
                             tts.textToSpeech(app.applicationContext, _seconds.value.toString())
-                        } else if (_seconds.value % 10 == 0) {
+                        } else if (_seconds.value == 45 || _seconds.value == 30 || _seconds.value == 10) {
                             tts.textToSpeech(app.applicationContext, "${_seconds.value} seconds left.")
                         }
                     }
@@ -174,8 +175,8 @@ class CustomTimer(initialSeconds: Int, initialReps: Int, restSeconds: Int, app: 
 
     fun startTimer() {
         _isRunning.value = true
-        _currentStatus.value = ""
-        _currentTimerColor.value = colorScheme!!.primaryContainer
+        _currentStatus.value = if (_isResting) "Break Time" else ""
+        _currentTimerColor.value = if (_isResting) colorScheme!!.surface else colorScheme!!.primaryContainer
         _timer?.start()
     }
 

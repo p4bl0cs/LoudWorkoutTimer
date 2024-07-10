@@ -34,11 +34,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.plr.loudworkouttimer.ui.theme.LoudWorkoutTimerTheme
@@ -78,6 +85,15 @@ fun AboutScreen() {
     val titleFontSize = 6.em
     val subTitleFontSize = 3.5.em
 
+    val titleBodyTextStyle = TextStyle(fontSize = titleFontSize, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold)
+    var titleTextStyle by remember { mutableStateOf(titleBodyTextStyle) }
+    var titleReadyToDraw by remember { mutableStateOf(false) }
+
+    val subTitleBodyTextStyle = TextStyle(fontSize = subTitleFontSize, color = MaterialTheme.colorScheme.primary,)
+    var subTitleTextStyle by remember { mutableStateOf(subTitleBodyTextStyle) }
+    var subTitleReadyToDraw by remember { mutableStateOf(false) }
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -109,10 +125,18 @@ fun AboutScreen() {
         ) {
            Text(
                text = "Loud Workout Timer v${versionName}",
-               textAlign = TextAlign.Center,
-               color = MaterialTheme.colorScheme.primary,
-               fontSize = titleFontSize,
-               fontWeight = FontWeight.ExtraBold
+               style = titleTextStyle,
+               softWrap = false,
+               maxLines = 1,
+               modifier = Modifier.drawWithContent { if (titleReadyToDraw) drawContent() },
+               onTextLayout = { textLayout ->
+                   if (textLayout.didOverflowWidth) {
+                       titleTextStyle = titleTextStyle.copy(fontSize = titleTextStyle.fontSize * 0.9)
+                   }
+                   else {
+                       titleReadyToDraw = true
+                   }
+               }
            )
 
             HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary)
@@ -121,8 +145,7 @@ fun AboutScreen() {
                 Text(
                     text = "Full Version",
                     textAlign = TextAlign.Right,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = subTitleFontSize,
+                    style = subTitleTextStyle
                 )
             }
 
@@ -133,8 +156,16 @@ fun AboutScreen() {
                         "Focus on your routine and let the app tell you how much you have left.\n\n" +
                         "Please leave any comments or suggestions on the app's Play Store page. ",
                 textAlign = TextAlign.Left,
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = subTitleFontSize,
+                style = subTitleTextStyle,
+                overflow = TextOverflow.Clip,
+                onTextLayout = { textLayoutResult ->
+                    if (textLayoutResult.didOverflowHeight) {
+                        subTitleTextStyle = subTitleTextStyle.copy(fontSize = subTitleTextStyle.fontSize * 0.9)
+                    }
+                    else {
+                        subTitleReadyToDraw = true
+                    }
+                }
             )
 
             ElevatedButton(
@@ -144,7 +175,7 @@ fun AboutScreen() {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.plr.loudworkouttimer"))
                 currentActivity.startActivity(intent)
             }) {
-                Row () {
+                Row (verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Default.ThumbUp,
                         "Rate",

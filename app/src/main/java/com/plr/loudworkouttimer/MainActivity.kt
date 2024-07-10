@@ -55,8 +55,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.Lifecycle
@@ -108,6 +111,8 @@ fun MainScreen() {
         mutableStateOf(false)
     }
 
+    val fontScaleFactor: Double = if (LocalDensity.current.density < 2) 0.7 else 1.0
+
     val openDialog = remember { mutableStateOf(false) }
 
     val mainContext = LocalContext.current
@@ -115,12 +120,20 @@ fun MainScreen() {
 
     val data = remember { TimerRepo(mainContext).getTimerInfoList()}
 
-    val titleFontSize = 6.em
-    val subTitleFontSize = 3.5.em
+    val titleFontSize = (6 * fontScaleFactor).em
+    val subTitleFontSize = (3.5 * fontScaleFactor).em
 
     var selectedTimerInfo: TimerInfo by remember {
         mutableStateOf(TimerInfo("", 0, 0, 0, null))
     }
+
+    val titleBodyTextStyle = TextStyle(fontSize = titleFontSize, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold,)
+    var titleTextStyle by remember { mutableStateOf(titleBodyTextStyle) }
+    var titleReadyToDraw by remember { mutableStateOf(false) }
+
+    val subTitleBodyTextStyle = TextStyle(fontSize = subTitleFontSize, color = MaterialTheme.colorScheme.primary,)
+    var subTitleTextStyle by remember { mutableStateOf(subTitleBodyTextStyle) }
+    var subTitleReadyToDraw by remember { mutableStateOf(false) }
 
     ComposableLifecycle { _, event ->
         if (event == Lifecycle.Event.ON_RESUME) {
@@ -145,8 +158,16 @@ fun MainScreen() {
             text = {
                 Text(
                     text = "Do you really want to delete '${selectedTimerInfo.name}'?",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = subTitleFontSize
+                    style = subTitleTextStyle,
+                    overflow = TextOverflow.Clip,
+                    onTextLayout = { textLayoutResult ->
+                        if (textLayoutResult.didOverflowHeight) {
+                            subTitleTextStyle = subTitleTextStyle.copy(fontSize = subTitleTextStyle.fontSize * 0.9)
+                        }
+                        else {
+                            subTitleReadyToDraw = true
+                        }
+                    }
                 )
             },
 
@@ -281,9 +302,16 @@ fun MainScreen() {
                             Column (modifier = Modifier.fillMaxWidth(0.67f)) {
                                 Text(
                                     t.name,
-                                    fontSize = titleFontSize,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold,
+                                    style = titleTextStyle,
+                                    overflow = TextOverflow.Clip,
+                                    onTextLayout = { textLayoutResult ->
+                                        if (textLayoutResult.didOverflowHeight) {
+                                            titleTextStyle = titleTextStyle.copy(fontSize = titleTextStyle.fontSize * 0.9)
+                                        }
+                                        else {
+                                            titleReadyToDraw = true
+                                        }
+                                    }
                                 )
 
                                 HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary)

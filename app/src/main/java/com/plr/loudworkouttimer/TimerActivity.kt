@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,6 +67,8 @@ class TimerActivity : ComponentActivity() {
 fun TimerScreen() {
     val mainContext = LocalContext.current
 
+    val fontScaleFactor: Double = if (LocalDensity.current.density < 2) 0.5 else 1.0
+
     val currentView = LocalView.current
     val currentIntent = (currentView.context as Activity).intent
     val currentActivity = LocalContext.current as Activity
@@ -85,6 +88,10 @@ fun TimerScreen() {
     val currentSet by vm.currentSet.collectAsState()
 
     val currentTimerColor by vm.currentTimerColor.collectAsState()
+
+    val currentTimeFontSize = (18 * fontScaleFactor).em
+    val currentSetFontSize = (10 * fontScaleFactor).em
+    val currentStatusFontSize = (12 * fontScaleFactor).em
 
     DisposableEffect(Unit) {
         currentView.keepScreenOn = true
@@ -152,7 +159,7 @@ fun TimerScreen() {
                         text = currentSet,
                         color = currentTimerColor,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 10.em)
+                        fontSize = currentSetFontSize)
 
                     CircularProgressIndicator(
                         color = currentTimerColor,
@@ -169,7 +176,7 @@ fun TimerScreen() {
                         Text(text = currentTime,
                             color = currentTimerColor,
                             fontWeight = FontWeight.Black,
-                            fontSize = 18.em)
+                            fontSize = currentTimeFontSize)
                     }
                 }
             }
@@ -192,7 +199,7 @@ fun TimerScreen() {
                 Text(text = currentStatus,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 12.em)
+                    fontSize = currentStatusFontSize)
             }
         }
     }

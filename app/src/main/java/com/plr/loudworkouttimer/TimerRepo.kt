@@ -69,7 +69,7 @@ class TimerRepo(private val context: Context) {
             return true
         }
 
-        return timerInfoList.find { it.name.lowercase() == name.lowercase() } == null
+        return timerInfoList.find { it.name.trim().lowercase() == name.lowercase() } == null
     }
 
     private fun getTimerInfoMaxID() : Int {

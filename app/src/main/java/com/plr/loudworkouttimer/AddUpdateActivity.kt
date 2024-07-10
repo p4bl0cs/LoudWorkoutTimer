@@ -40,12 +40,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import com.chargemap.compose.numberpicker.NumberPicker
 import com.plr.loudworkouttimer.ui.theme.LoudWorkoutTimerTheme
 
@@ -72,6 +74,8 @@ fun AddUpdateScreen() {
     val currentIntent = (currentView.context as Activity).intent
     val currentActivity = LocalContext.current as Activity
 
+    val fontScaleFactor: Double = if (LocalDensity.current.density < 2) 0.7 else 1.0
+
     val _timerInfo = TimerInfo(
         currentIntent.getStringExtra("timerName").orEmpty(),
         currentIntent.getIntExtra("seconds", 30),
@@ -88,8 +92,8 @@ fun AddUpdateScreen() {
 
     var _reps by remember { mutableStateOf(_timerInfo.initialSets) }
 
-    val labelFontSize = 4.5.em
-    val numberFontSize = 8.em
+    val labelFontSize = (4.5 * fontScaleFactor).em
+    val numberFontSize = 24.sp//8.em
     val sectionSeparationSize = 8.dp
 
     val mainContext = LocalContext.current
@@ -117,7 +121,7 @@ fun AddUpdateScreen() {
             )
         }
     ) {
-        Column {
+        Column (Modifier.fillMaxWidth().wrapContentHeight()) {
             Row (
                 modifier = Modifier
                     .wrapContentHeight()
@@ -143,7 +147,7 @@ fun AddUpdateScreen() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center) {
                 Text(
-                    text = "Minutes",
+                    text = "Minutes ",
                     textAlign = TextAlign.Right,
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = labelFontSize
@@ -164,7 +168,7 @@ fun AddUpdateScreen() {
 
                 Text(
                     modifier = Modifier.padding(start = 20.dp),
-                    text = "Seconds",
+                    text = "Seconds ",
                     textAlign = TextAlign.Right,
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = labelFontSize
@@ -173,7 +177,7 @@ fun AddUpdateScreen() {
                 NumberPicker(
                     dividersColor = MaterialTheme.colorScheme.primary,
                     value = _seconds,
-                    range = 10..59,
+                    range = 0..59,
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = numberFontSize,
@@ -209,7 +213,7 @@ fun AddUpdateScreen() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center) {
                 Text(
-                    text = "Minutes",
+                    text = "Minutes ",
                     textAlign = TextAlign.Right,
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = labelFontSize
@@ -218,7 +222,7 @@ fun AddUpdateScreen() {
                 NumberPicker(
                     dividersColor = MaterialTheme.colorScheme.primary,
                     value = _restMinutes,
-                    range = 0..14,
+                    range = 0..15,
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = numberFontSize,
@@ -230,7 +234,7 @@ fun AddUpdateScreen() {
 
                 Text(
                     modifier = Modifier.padding(start = 20.dp),
-                    text = "Seconds",
+                    text = "Seconds ",
                     textAlign = TextAlign.Right,
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = labelFontSize
@@ -239,7 +243,7 @@ fun AddUpdateScreen() {
                 NumberPicker(
                     dividersColor = MaterialTheme.colorScheme.primary,
                     value = _restSeconds,
-                    range = 10..59,
+                    range = 0..59,
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = numberFontSize,
@@ -257,7 +261,7 @@ fun AddUpdateScreen() {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Sets",
+                    text = "Sets ",
                     textAlign = TextAlign.Right,
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = labelFontSize,
@@ -342,6 +346,24 @@ fun AddUpdateScreen() {
                     elevation = ButtonDefaults.elevatedButtonElevation(defaultElevation = 5.dp),
 
                     onClick = {
+                        if (_minutes == 0 && _seconds < 10) {
+                            Toast.makeText(
+                                mainContext,
+                                "Workout time must be at least 10 seconds.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@ElevatedButton
+                        }
+
+                        if (_restMinutes == 0 && _restSeconds < 10) {
+                            Toast.makeText(
+                                mainContext,
+                                "Break time must be at least 10 seconds.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@ElevatedButton
+                        }
+
                         if (_timerName.trim().isEmpty()) {
                             Toast.makeText(
                                 mainContext,
@@ -364,7 +386,7 @@ fun AddUpdateScreen() {
                             }
                         }
 
-                        _timerInfo.name = _timerName
+                        _timerInfo.name = _timerName.trim()
                         _timerInfo.initialSets = _reps
                         _timerInfo.initialSeconds = (_minutes * 60) + _seconds
                         _timerInfo.breakSeconds = (_restMinutes * 60) + _restSeconds
